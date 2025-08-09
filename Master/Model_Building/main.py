@@ -26,5 +26,5 @@ if not hf_token:
 
 if job == 'register':
   data_reg = DataRegistration(base_path, hf_token)
-  if not data_reg.To_run_Pipeline():
+  if not data_reg.ToRunPipeline():
     sys.exit(1)

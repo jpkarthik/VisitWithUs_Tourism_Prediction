@@ -56,14 +56,17 @@ class DataRegistration:
     finally:
       print("-"*100)
 
-  def To_run_Pipeline(self):
+  def ToRunPipeline(self):
     print(f"Function Name {inspect.currentframe().f_code.co_name}")
     if not self.HFCreateRepo():
       print("Exception occured while creating the repo in DataRegistration.py")
       return False
-    
-    if not self.UploadingSourceData():
-      print("Exception occured while uploading the source data into HF dataset")
-      return False
+    else:
+      if not self.UploadingSourceData():
+        print("Exception occured while uploading the source data into HF dataset")
+        return False
+      else:
+        print("FunctionToRunPipeline completed")
+        return True
     
 
