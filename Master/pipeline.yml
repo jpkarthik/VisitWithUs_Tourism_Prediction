@@ -1,0 +1,58 @@
+name: Visit With Us Toursim Prediction Pipeline
+
+on:
+  push:
+    branches:
+      - main # Automatically triggers on push to the main branch
+    paths:
+      - 'Master/Data/tourism.csv'
+      - 'Master/Model_Building/DataRegistration.py'
+      - 'Master/Model_Building/main.py'
+  workflow_dispatch:
+
+jobs:
+  register-dataset:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      
+      - name: Setup python
+        uses: actions/checkout@v3
+        with:
+          python-version: '3.12'
+      
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install huggingface_hub python-dotenv
+      
+      - name: Copy tourism.csv(if using a local file)
+        run: |
+          mkdir -p Master/Data cp tourism.csv Master/Data/ || echo "tourism.csv not found in root"
+      
+      - name: Run Data Registration
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          cd Master/Model_Building
+          python main.py --job register
+        continue-on-error: false
+
+      - name: Check Pipeline status
+        if: failure()
+        run: |
+          echo "Data Registration pipeline failed. please check logs"
+          exit 1
+      
+      - name: Verify Upload
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          echo "Verifying Upload on Hugging Face"
+          python -c "from huggingface_hub import HfApi; api= HfApi; print(api.repo_info('jpkarthikeyan/Tourism-visit-with-us-dataset'))"
+
+
+
+
+    
