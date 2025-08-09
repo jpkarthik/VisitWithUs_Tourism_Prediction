@@ -8,6 +8,7 @@ on:
       - 'Master/Data/tourism.csv'
       - 'Master/Model_Building/DataRegistration.py'
       - 'Master/Model_Building/main.py'
+      - '.github/workflows/pipeline.yml'
   workflow_dispatch:
 
 jobs:
@@ -50,7 +51,7 @@ jobs:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
           echo "Verifying Upload on Hugging Face"
-          python -c "from huggingface_hub import HfApi; api= HfApi; print(api.repo_info('jpkarthikeyan/Tourism-visit-with-us-dataset'))"
+          python -c "from huggingface_hub import HfApi; api= HfApi(token=os.getenv('HF_TOKEN')); print(api.repo_info('jpkarthikeyan/Tourism-visit-with-us-dataset'))"
 
 
 
