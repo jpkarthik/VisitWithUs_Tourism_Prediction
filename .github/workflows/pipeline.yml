@@ -26,7 +26,7 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install huggingface_hub python-dotenv os
+          pip install huggingface_hub python-dotenv
       
       - name: Copy tourism.csv(if using a local file)
         run: |
@@ -51,7 +51,7 @@ jobs:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
           echo "Verifying Upload on Hugging Face"
-          python -c "from huggingface_hub import HfApi; api= HfApi(token=os.getenv('HF_TOKEN')); print(api.repo_info('jpkarthikeyan/Tourism-visit-with-us-dataset'))"
+          python -c "import os;from huggingface_hub import HfApi; api= HfApi(token=os.getenv('HF_TOKEN')); print(api.repo_info('jpkarthikeyan/Tourism-visit-with-us-dataset'))"
 
 
 
