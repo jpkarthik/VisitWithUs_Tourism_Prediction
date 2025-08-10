@@ -149,3 +149,27 @@ jobs:
           git push https://${{ secrets.GITHUB_TOKEN }}@github.com/jpkarthik/VisitWithUs_Tourism_Prediction.git HEAD:maim          
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy-to-spaces:
+    runs-on: ubuntu-latest
+    needs: model-building
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Hugging Face
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          echo $HF_TOKEN | docker login -u ${GITHUB_ACTOR} --password-stdin gchr.io
+      
+      - name: Build and Push Docker image to Hugging Face Spaces
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          cd Deployment
+          docker build -t jpkarthik/tourism-prediction-app:
