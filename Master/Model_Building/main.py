@@ -20,7 +20,7 @@ model_dir = os.path.join(base_path,'Model_Dump_JOBLIB')
 
 parser = argparse.ArgumentParser(description='Run a specific job in the pipeline')
 parser.add_argument('--job', type=str, required=True,
-                    choices=['register','prepare'],
+                    choices=['register','prepare','modelbuilding'],
                     help='Job To execute register or prepare')
 args = parser.parse_args()
 
@@ -39,4 +39,9 @@ elif args.job == 'prepare':
   from DataPrepration import DataPrepration
   obj_data_prep = DataPrepration(base_path,hf_token)
   if not obj_data_prep.ToRunPipeline():
+    sys.exit(1)
+elif args.job == 'modelbuilding':
+  from BuildingModels import BuildingModels
+  ObjBuildModel = BuildingModels(base_path,hf_token)
+  if not ObjBuildModel.ToRunPipeline():
     sys.exit(1)

@@ -15,6 +15,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.impute import SimpleImputer
 from huggingface_hub.utils import RepositoryNotFoundError
 from huggingface_hub import HfApi, create_repo, login
+from huggingface_hub import hf_hub_download
 from sklearn.metrics import accuracy_score, confusion_matrix
 from sklearn.model_selection import KFold, RandomizedSearchCV
 from sklearn.metrics import precision_recall_curve, precision_score
@@ -26,6 +27,7 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder
 
 class BuildingModels:
   def __init__(self,base_path, hf_token=None):
+    print(f"Function Name {inspect.currentframe().f_code.co_name}")
     self.models = {}
     self.best_model = None
     self.best_score = 0
@@ -39,7 +41,7 @@ class BuildingModels:
     self.target_train = pd.Series()
     self.target_test = pd.Series()
     self.base_path = base_path
-    self.Subfolders = os.path.join(base_path,'data')
+    self.Subfolders = os.path.join(base_path,'Data')
     self.repo_id = 'jpkarthikeyan/Tourism_Prediction_Model'
     self.ds_repo_id = 'jpkarthikeyan/Tourism-visit-with-us-dataset'
     self.repo_type = 'model'
@@ -60,45 +62,44 @@ class BuildingModels:
         ('onehot', OneHotEncoder(drop='first',handle_unknown='ignore',sparse_output=False))
     ])
 
-
-
   def Load_data_from_HF(self):
     print(f"Function Name {inspect.currentframe().f_code.co_name}")
     try:
-      print(f'Loading the train dataset from {self.ds_repo_id}')
-      load_train = load_dataset(path=self.ds_repo_id,data_dir=self.Subfolders,
-                                data_files={'train':'train.csv'})
-      self.df_train = pd.DataFrame(load_train['train'])
-      print(f"Shape of the train dataset: {self.df_train.shape}")
+      self.df_test = pd.read_csv(hf_hub_download(
+                      repo_id=self.ds_repo_id,
+                      filename='Master/Data/test.csv',
+                      repo_type='dataset'))
+      print(f"Shape of the test dataset {self.df_test.shape}")
 
-      print(f'Loading the test dataset from {self.ds_repo_id}')
-      load_test = load_dataset(path=self.ds_repo_id,data_dir=self.Subfolders,
-                                data_files={'test':'test.csv'})
-      self.df_test = pd.DataFrame(load_test['test'])
+      self.df_train = pd.read_csv(hf_hub_download(
+                      repo_id=self.ds_repo_id,
+                      filename='Master/Data/train.csv',
+                      repo_type='dataset'))
+      print(f"Shape of the train dataset {self.df_test.shape}")
 
-      print(f"Shape of the test dataset: {self.df_test.shape}")
+
+      
+      return True
 
     except Exception as ex:
-      print(f"Exception: {ex}")
+      print(f"Exception in {inspect.currentframe().f_code.co_name}: {ex}")
       traceback.print_exc()
-      raise
-
+      return False
     finally:
       print('-'*50)
 
   def Preprocessing_dataset(self):
     print(f"Function Name {inspect.currentframe().f_code.co_name}")
     try:
-
       self.target_train = self.df_train['ProdTaken']
       self.feature_train = self.df_train.drop(['ProdTaken'],axis=1)
-
       self.target_test = self.df_test['ProdTaken']
       self.feature_test = self.df_test.drop(['ProdTaken'],axis=1)
-
+      return True
     except Exception as ex:
-      print(f"Exception: {ex}")
+      print(f"Exception {inspect.currentframe().f_code.co_name}: {ex}")
       traceback.print_exc()
+      return False
     finally:
       print('-'*50)
 
@@ -212,10 +213,9 @@ class BuildingModels:
 
       return self.models
     except Exception as ex:
-      print(f"Exception: {ex}")
+      print(f"Exception {inspect.currentframe().f_code.co_name}: {ex}")
     finally:
       print('-'*50)
-
 
   def Model_Evaluation(self):
     print(f"Function Name {inspect.currentframe().f_code.co_name}")
@@ -261,8 +261,9 @@ class BuildingModels:
         plt.xlabel('Predicted')
         plt.ylabel('Actual')
         plt.title(f'{mdl_name} confusion matrix')
-        plt.tight_layout()
-        plt.show()
+        plot_path = os.path.join(self.base_path,'Model_Dump_JOBLIB',f'{mdl_name}_ConfusionMatrix.png')
+        plt.savefig(plot_path,dpi=300)
+        plt.close()
 
         df_metrics = pd.concat([df_metrics,pd.DataFrame({'model':[mdl_name],'accuracy':[accuracy],
                                             'precision':[precision], 'recall':[recall],
@@ -285,10 +286,9 @@ class BuildingModels:
       return df_metrics
 
     except Exception as ex:
-      print(f"Exception: {ex}")
+      print(f"Exception {inspect.currentframe().f_code.co_name}: {ex}")
     finally:
       print('-'*50)
-
 
   def Register_BestModel_HF(self):
     print(f"Function Name {inspect.currentframe().f_code.co_name}")
@@ -318,11 +318,43 @@ class BuildingModels:
                       path_in_repo = f"Model_Dump_JOBLIB/best_threshold.txt",
                       repo_id=self.repo_id, repo_type=self.repo_type
                       )
+      return True
 
 
     except Exception as ex:
-      print(f"Exception: {ex}")
+      print(f"Exception {inspect.currentframe().f_code.co_name}: {ex}")
       traceback.print_exc()
+      return False
     finally:
       print('-'*50)
+
+  def ToRunPipeline(self):
+    print(f"Function Name {inspect.currentframe().f_code.co_name}")
+    try:
+      if not self.Load_data_from_HF():
+        return False
+      else:
+        if not self.Preprocessing_dataset():
+          return False
+        else:
+          Build_Model = self.Building_Models()
+          print(Build_Model)
+          if Build_Model:
+            df_Metrics = self.Model_Evaluation()
+            print(df_Metrics)
+            if not df_Metrics.empty:
+              if self.Register_BestModel_HF():
+                return True
+              else:
+                return False
+            else:
+              return False
+          else:
+            return False
+            
+
+    except Exception as ex:
+      print(f"Exception occured in the Model Building {ex}")
+      traceback.print_exc()
+      return False
 
