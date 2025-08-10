@@ -7,6 +7,7 @@ on:
     paths:
       - 'Master/Data/tourism.csv'
       - 'Master/Model_Building/DataRegistration.py'
+      - 'Master/Model_Building/DataPrepration.py'
       - 'Master/Model_Building/main.py'
       - '.github/workflows/pipeline.yml'
   workflow_dispatch:
@@ -19,7 +20,7 @@ jobs:
         uses: actions/checkout@v3
       
       - name: Setup python
-        uses: actions/checkout@v3
+        uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       
@@ -53,7 +54,44 @@ jobs:
           echo "Verifying Upload on Hugging Face"
           python -c "import os;from huggingface_hub import HfApi;api= HfApi(token=os.getenv('HF_TOKEN'));print(api.repo_info(repo_id='jpkarthikeyan/Tourism-visit-with-us-dataset',repo_type='dataset'))"
 
+  data-prepration:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install huggingface_hub python-dotenv datasets pandas scikit-learn
 
+      - name: Copying tourism.csv
+        run: |
+          mkdir -p Master/Data
+          cp tourism.csv Master/Data || echo "tourism.csv not found in root"
 
+      - name: Run DataPrepration.py
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          cd Master/Model_Building
+          python main.py --job prepare
+        continue-on-error: false
+
+      - name: Check Pipeline Status
+        if: failure()
+        run: |
+          echo "Data Prepration pipeline failed. please check the log"
+          exit 1
+      - name: Verify Upload
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          echo "Verifying Upload on Hugging Face"
+          python -c "import os; from huggingface_hub import HfApi; token = os.getenv('HF_TOKEN'); if token: api=HfApi(token=token); print(api.repo_info(repo_id='jpkarthikeyan/Tourism-visit-with-us-dataset', repo_type='dataset')) else: print('HF_TOKEN not found in environment')"
     
