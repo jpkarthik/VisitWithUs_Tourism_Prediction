@@ -56,6 +56,7 @@ jobs:
 
   data-prepration:
     runs-on: ubuntu-latest
+    needs: register-dataset
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
