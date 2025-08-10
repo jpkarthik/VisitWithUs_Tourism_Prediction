@@ -1,0 +1,9 @@
+datasets
+pandas
+numpy
+scikit-learn
+joblib
+streamlit
+huggingface_hub
+xgboost
+python-dotenv

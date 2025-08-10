@@ -142,6 +142,6 @@ class DataPrepration:
             return False
           else:
             print("dataset downloaded from HF, cleaned, " \
-            "splitted into train and test and " \
+            "splitted into train and test dataset and " \
             "uploaded back into HF dataset")
             return True       
