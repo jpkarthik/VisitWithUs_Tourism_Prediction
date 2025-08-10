@@ -11,7 +11,7 @@ print(f'Base path {base_path}')
 sys.path.append(os.path.join(base_path,'Model_Building'))
 print(f'System Path {sys.path.append(os.path.join(base_path,'Model_Building'))}')
 from DataRegistration import DataRegistration
-from DataPrepration import DataPrepration
+
 
 data_dir = os.path.join(base_path, 'Data')
 model_dir = os.path.join(base_path,'Model_Dump_JOBLIB')
@@ -36,6 +36,7 @@ if args.job == 'register':
   if not data_reg.ToRunPipeline():
     sys.exit(1)
 elif args.job == 'prepare':
+  from DataPrepration import DataPrepration
   obj_data_prep = DataPrepration(base_path,hf_token)
   if not obj_data_prep.ToRunPipeline():
     sys.exit(1)

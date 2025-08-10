@@ -93,5 +93,5 @@ jobs:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
           echo "Verifying Upload on Hugging Face"
-          python -c "import os; from huggingface_hub import HfApi; token = os.getenv('HF_TOKEN'); if token: api=HfApi(token=token); print(api.repo_info(repo_id='jpkarthikeyan/Tourism-visit-with-us-dataset', repo_type='dataset')) else: print('HF_TOKEN not found in environment')"
+          python -c "import os; from huggingface_hub import HfApi; token = os.getenv('HF_TOKEN');print(HfApi(token=token).repo_info(repo_id='jpkarthikeyan/Tourism-visit-with-us-dataset', repo_type='dataset'))"
     
