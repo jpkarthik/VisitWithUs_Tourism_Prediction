@@ -312,7 +312,8 @@ class BuildingModels:
 
 
       print("Uploading the best threshold text file to HF")
-      with open('Master/Model_Dump_JOBLIB/best_threshold.txt','w') as f:
+      threshold_path = os.path.join(self.base_path,'Model_Dump_JOBLIB/best_threshold.txt')
+      with open(threshold_path,'w') as f:
         f.write(str(self.best_model_threshold))
       api.upload_file(path_or_fileobj = f"{self.base_path}/Model_Dump_JOBLIB/best_threshold.txt",
                       path_in_repo = f"Model_Dump_JOBLIB/best_threshold.txt",
