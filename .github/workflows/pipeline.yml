@@ -144,9 +144,7 @@ jobs:
         run: |
           ls -l Master/Model_Dump_JOBLIB/
 
-      - name: Pull Remote changes
-        run: |
-          git pull origin main --rebase
+      
       
       - name: Commit and Push Generated Files
         
@@ -155,7 +153,14 @@ jobs:
           git config --global user.email 'github-actions@users.noreply.github.com'
           git add Master/Model_Dump_JOBLIB/*
           git commit -m "Adding genearated model files and confusion matrix plots" || echo "No changes to commit"
-          git push https://${{ secrets.GITHUB_TOKEN }}@github.com/jpkarthik/VisitWithUs_Tourism_Prediction.git HEAD:maim          
+          
+      - name: Pull Remote changes
+        run: |
+          git pull origin main --rebase
+      
+      - name: Push Generated Files
+        run: |
+          git pull origin main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
