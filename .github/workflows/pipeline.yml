@@ -177,18 +177,17 @@ jobs:
 
       - name: Login to GITHUB CONTAINER REGISTRY
         env:
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo $HF_TOKEN | docker login -u ${GITHUB_ACTOR} --password-stdin ghcr.io
       
       - name: Build and Push Docker image to GITHUB Container REGISTRY
         env:
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           cd Master/Deployment
           docker build -t jpkarthik/tourism-prediction-app:latest .
           docker tag jpkarthik/tourism-prediction-app:latest ghcr.io/jpkarthik/tourism-prediction-app:latest
-          echo $HF_TOKEN | docker login -u ${GITHUB_ACTOR} --password-stdin ghcr.io
           docker push ghcr.io/jpkarthik/tourism-prediction-app:latest
         
       - name: Deploy to Hugging Face Spaces
