@@ -11,6 +11,7 @@ on:
       - 'Master/Model_Building/BuildingModels.py'
       - 'Master/Model_Building/main.py'
       - '.github/workflows/pipeline.yml'
+      - 'Master/Deployment/**'
   workflow_dispatch:
 
 jobs:
@@ -171,5 +172,26 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          cd Deployment
-          docker build -t jpkarthik/tourism-prediction-app:
+          cd Master/Deployment
+          docker build -t jpkarthik/tourism-prediction-app:latest .
+          docker tag jpkarthik/tourism-prediction-app:latest ghcr.io/jpkarthik/tourism-prediction-app:latest
+          echo $HF_TOKEN | docker login -u ${GITHUB_ACTOR} --password-stdin ghcr.io
+          docker push ghcr.io/jpkarthik/tourism-prediction-app:latest
+        
+      - name: Deploy to Hugging Face Spaces
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          cd Master/Deployment
+          huggingface-cli login --token $HF_TOKEN
+          huggingface-cli repo sync --repo-id jpkarthik/tourism-prediction-app --token $HF_TOKEN
+          echo "Deployment to Hugging Face space completed"
+
+      - name: Check Deployment Status
+        if: failure()
+        run: |
+          echo "Deployment to Huggingface space failed please check logs"
+          exit 1
+
+
+
