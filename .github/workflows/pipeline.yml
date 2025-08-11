@@ -175,13 +175,13 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Login to Hugging Face
+      - name: Login to GITHUB CONTAINER REGISTRY
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          echo $HF_TOKEN | docker login -u ${GITHUB_ACTOR} --password-stdin gchr.io
+          echo $HF_TOKEN | docker login -u ${GITHUB_ACTOR} --password-stdin ghcr.io
       
-      - name: Build and Push Docker image to Hugging Face Spaces
+      - name: Build and Push Docker image to GITHUB Container REGISTRY
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
