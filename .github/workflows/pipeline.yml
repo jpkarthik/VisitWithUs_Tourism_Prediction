@@ -115,6 +115,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install huggingface_hub python-dotenv pandas numpy scikit-learn joblib xgboost seaborn matplotlib datasets
 
+      - name: Create Model Dump Directory
+        run: |
+          mkdir -p Master/Model_Dump_JOBLIB
+
       - name: Run Model Building
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
@@ -139,6 +143,10 @@ jobs:
       - name: List Generated Files
         run: |
           ls -l Master/Model_Dump_JOBLIB/
+
+      - name: Pull Remote changes
+        run: |
+          git pull origin main --rebase
       
       - name: Commit and Push Generated Files
         
