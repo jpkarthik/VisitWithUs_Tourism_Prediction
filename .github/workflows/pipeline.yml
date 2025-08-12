@@ -32,9 +32,22 @@ jobs:
           python -m pip install --upgrade pip
           pip install huggingface_hub python-dotenv
       
+      - name: List Directory Contents(Debug)
+        run: |
+          ls -la Master/Data/ || echo "Master/Data/ directory not found"
+          ls -la . || echo "Root Directory contents"
+
       - name: Copy tourism.csv(if using a local file)
         run: |
-          mkdir -p Master/Data cp tourism.csv Master/Data/ || echo "tourism.csv not found in root"
+          mkdir -p Master/Data 
+          if [ -f tourism.csv ]; then
+            cp tourism.csv Master/Data/
+            echo "Copied tourism.csv from root to Master/Data/"
+          else
+            echo "tourism.csv not found in root attemtpting to download from hugging face"
+
+            python -c "from huggingface_hub import hf_hub_download;hf_hub_download(repo_id='jpkarthikeyan/Tourism-visit-with-us-dataset',filename='tourism.csv',local_dir='Master/Data/')"
+            fi
       
       - name: Run Data Registration
         env:
