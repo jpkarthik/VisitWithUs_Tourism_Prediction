@@ -34,7 +34,7 @@ class HostingInHuggingFace:
       api = HfApi(token=self.hf_token)
       directory_to_upload = os.path.join(self.base_path,'Deployment')
 
-      print(f"Uploadinf the files in {directory_to_upload} into {repo_id}")
+      print(f"Uploadinf the files in {directory_to_upload} into {self.repo_id}")
       api.upload_folder(repo_id = self.repo_id, 
                         folder_path = directory_to_upload,
                       repo_type='space')
