@@ -11,6 +11,10 @@ class DataRegistration:
     self.folder_data = os.path.join(base_path,"Data")
     self.hf_token = hf_token
     os.makedirs(self.folder_data, exist_ok=True)
+    print(f"self.Subfolders {self.Subfolders}")
+    print(f"self.folder_Master {self.folder_Master}")
+    print(f"self.folder_data {self.folder_data}")
+
 
   def HFCreateRepo(self):
     print(f"Function Name {inspect.currentframe().f_code.co_name}")
@@ -37,6 +41,7 @@ class DataRegistration:
     print(f"Function Name {inspect.currentframe().f_code.co_name}")
     try:
       source_data_file = os.path.join(self.folder_data,'tourism.csv')
+      print(source_data_file)
       if not os.path.exists(source_data_file):
         raise FileNotFoundError(f"File {source_data_file} not found")
       api = HfApi()

@@ -16,10 +16,12 @@ class DataPrepration:
   def LoadDatasetFromHF(self):
     print(f"Function Name {inspect.currentframe().f_code.co_name}")
     try:
-      loading_dataset = load_dataset(path=self.repoID,
-                  data_files={'train':'Master/Data/tourism.csv'},
-                  token=self.hf_token)
-      df_dataset = pd.DataFrame(loading_dataset['train'])
+      print(f"Downloadin the tourism.csv from {self.repoID}")
+      df_dataset = pd.read_csv(hf_hub_download(
+                      repo_id=self.repoID,
+                      filename='Master/Data/tourism.csv',
+                      repo_type='dataset'))
+      
       print(f'Shape {df_dataset.shape}')
 
       if 'Unnamed: 0' in df_dataset.columns:

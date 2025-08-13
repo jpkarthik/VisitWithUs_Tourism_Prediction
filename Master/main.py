@@ -5,11 +5,12 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-base_path = os.path.abspath(os.path.join(os.path.dirname(__file__),'..','..'))
-base_path = os.path.join(base_path,'Master')
+base_path = os.path.abspath((os.path.dirname(__file__)))
+
 print(f'Base path {base_path}')
-sys.path.append(os.path.join(base_path,'Model_Building'))
-print(f'System Path {sys.path.append(os.path.join(base_path,'Model_Building'))}')
+
+sys.path.append(base_path)
+
 from DataRegistration import DataRegistration
 
 
